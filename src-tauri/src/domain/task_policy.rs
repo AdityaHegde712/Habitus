@@ -3,13 +3,34 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum TaskId {
+    #[serde(rename = "meals")]
     Meals,
+    #[serde(rename = "sleep_7h")]
     Sleep7h,
+    #[serde(rename = "exercise")]
     Exercise,
+    #[serde(rename = "job_application")]
     JobApplication,
+    #[serde(rename = "vitamins")]
     Vitamins,
+    #[serde(rename = "leetcode_or_dsa")]
     LeetcodeOrDsa,
+    #[serde(rename = "surfaces_clean")]
     SurfacesClean,
+}
+
+impl TaskId {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Meals => "meals",
+            Self::Sleep7h => "sleep_7h",
+            Self::Exercise => "exercise",
+            Self::JobApplication => "job_application",
+            Self::Vitamins => "vitamins",
+            Self::LeetcodeOrDsa => "leetcode_or_dsa",
+            Self::SurfacesClean => "surfaces_clean",
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
