@@ -1,6 +1,6 @@
 # Task Ledger
 
-## Current phase: Phase 2 domain and persistence - Green
+## Current phase: Phase 3 native integration - not started
 
 1. [x] Capture the stated task checklist and tray/startup requirements.
    - Acceptance: Plan identifies close-to-tray and explicit-exit semantics.
@@ -19,11 +19,18 @@
    - Packaging evidence: `npm run tauri build` completed on the stable MSVC target. `src-tauri/target/release/bundle/msi/Habit Tracker_0.1.0_x64_en-US.msi` is 2,965,504 bytes with SHA-256 `0B37287EB17A3BE2002C6739985B45DE000BC40254C79E32C72CBB7A56EC821A`. `src-tauri/target/release/bundle/nsis/Habit Tracker_0.1.0_x64-setup.exe` is 1,907,213 bytes with SHA-256 `AD521E6944A158309DA96D4F2DCD8A41C3F21D01F9FF52513B3C7EF570CD5CC2`.
    - Manual evidence: the owner installed the generated artifact and confirmed close hides the window, tray Open restores it, and tray Exit removes both the window and tray icon. Per-user data-location verification is deferred because SQLite persistence begins in Phase 2.
    - Autostart evidence: the approved temporary `--phase0-autostart=enable|disable|status` Rust diagnostic compiled. It performed `enable -> true`, independent `status -> true`, and `disable -> false` as the current user without elevation. The debug WebView emitted a non-fatal class-unregistration error after each intentionally immediate diagnostic exit; Cargo returned success. The diagnostic performs no operation without one exact argument, is not renderer-accessible, and must be removed before Phase 3's final typed command boundary.
-   - Next action: commit Phase 0, then create and run the frozen Phase 1 contract tests.
+   - Git evidence: Phase 0 was merged to `origin/dev` by the owner as `f65cd60`. After the owner merged Phase 1, `git fetch --prune origin` confirmed both feature remotes deleted and `origin/dev` at `97ddd2f`.
 6. [x] Create and run the frozen Phase 1 domain and persistence contracts.
-   - Evidence: `cargo test --manifest-path src-tauri/Cargo.toml --tests` failed as expected on 2026-09-02. Each frozen suite fails only because `tauri_app_lib::domain` or `tauri_app_lib::persistence` is not implemented.
+   - Red evidence: `cargo test --manifest-path src-tauri/Cargo.toml --tests` failed as expected on 2026-09-02. Each frozen suite failed only because `tauri_app_lib::domain` or `tauri_app_lib::persistence` was not implemented.
    - Contract: `tests/spec/day_policy.rs`, `history.rs`, `backup_contract.rs`, and `import_export_contract.rs` are immutable without owner approval.
-   - Next action: implement the smallest domain and persistence modules that make these tests pass; do not modify the frozen assertions.
-7. [/] Define the streak qualifying-day rule.
+   - Green evidence: all 11 frozen assertions pass on the code retained by `origin/dev` at `97ddd2f`. The merged source tree matches the former Phase 1 working tree.
+7. [x] Complete Phase 2 repository behavior and its exit criteria.
+   - Evidence: `tests/integration/repository.rs` adds mutable assertions for backup-aware validated import, typed task changes that retain date-specific snapshots and pre-change backup state, and idempotent reopening of an existing SQLite database. The frozen `tests/spec/` assertions remain unchanged.
+   - Verification: `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, `cargo test --manifest-path src-tauri/Cargo.toml --tests` (14 assertions), `cargo check --manifest-path src-tauri/Cargo.toml`, and `npm run build` passed on 2026-09-02. The frontend build required the normal workspace permission to let Vite resolve its configuration; it then completed normally.
+   - Documentation: `README.md` and `CODEBASE.md` now describe only verified Phase 2 data flow and clearly defer the host app-data location and typed Tauri commands to Phase 3.
+8. [/] Add the Phase 3 native command boundary and remove the temporary Phase 0 autostart diagnostic.
+   - Acceptance: commands expose only `get_day`, `set_task_checked`, `list_calendar_days`, `export_state`, `import_state`, `get_autostart_status`, and `set_autostart_enabled`; caller-controlled SQL and filesystem paths remain impossible; integration tests and manual Windows lifecycle evidence pass.
+   - Immediate next action: create mutable command-boundary tests that fix the app-data directory and reject invalid typed inputs before implementation.
+9. [/] Define the streak qualifying-day rule.
    - Blocker: streak calculations cannot be implemented without knowing which completion fraction qualifies.
    - Acceptance: ADR-006 is accepted and `tests/spec/streaks.rs` receives frozen assertions.

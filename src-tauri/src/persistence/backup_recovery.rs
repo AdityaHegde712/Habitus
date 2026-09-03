@@ -63,7 +63,9 @@ impl BackupStore {
         self.promote_staged_pre_change()
     }
 
-    fn promote_staged_pre_change(&self) -> Result<(), String> {
+    pub fn promote_staged_pre_change(&self) -> Result<(), String> {
+        self.validate_staged_pre_change()?;
+
         let previous_one = self.previous_one_path();
         let previous_two = self.previous_two_path();
 
@@ -74,6 +76,14 @@ impl BackupStore {
 
         fs::rename(self.staging_path(), previous_one)
             .map_err(|error| format!("unable to promote staged backup: {error}"))
+    }
+
+    fn validate_staged_pre_change(&self) -> Result<(), String> {
+        let serialized = fs::read(self.staging_path())
+            .map_err(|error| format!("unable to read staged backup state: {error}"))?;
+        serde_json::from_slice::<FullState>(&serialized)
+            .map_err(|error| format!("staged backup state is invalid JSON: {error}"))?;
+        Ok(())
     }
 
     fn previous_one_path(&self) -> PathBuf {

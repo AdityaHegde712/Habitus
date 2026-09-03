@@ -1,10 +1,13 @@
-use std::path::PathBuf;
+use std::{cell::RefCell, path::PathBuf};
 
 use rusqlite::{params, Connection, OptionalExtension};
 
-use super::transfer::FullState;
+use crate::domain::task_policy::TaskId;
+
+use super::{backup_recovery::BackupStore, transfer::FullState};
 
 pub struct Repository {
+    backups: RefCell<BackupStore>,
     connection: Connection,
 }
 
@@ -26,23 +29,18 @@ impl Repository {
             )
             .map_err(|error| format!("unable to initialize SQLite schema: {error}"))?;
 
-        Ok(Self { connection })
+        let backups = BackupStore::new(directory.join("backups"))?;
+
+        Ok(Self {
+            backups: RefCell::new(backups),
+            connection,
+        })
     }
 
     pub fn seed(&self, state: FullState) -> Result<(), String> {
         let serialized = serde_json::to_string(&state)
             .map_err(|error| format!("unable to serialize application state: {error}"))?;
-        self.connection
-            .execute(
-                "
-                INSERT INTO application_state (id, serialized_state)
-                VALUES (1, ?1)
-                ON CONFLICT(id) DO UPDATE SET serialized_state = excluded.serialized_state
-                ",
-                params![serialized],
-            )
-            .map_err(|error| format!("unable to persist application state: {error}"))?;
-        Ok(())
+        self.persist_state(&serialized)
     }
 
     pub fn export_state(&self) -> Result<String, String> {
@@ -67,6 +65,68 @@ impl Repository {
         let state: FullState = serde_json::from_str(serialized)
             .map_err(|error| format!("import is not a valid full-state document: {error}"))?;
         state.validate(current_local_date)?;
-        self.seed(state)
+        self.replace_validated_state(state)
+    }
+
+    pub fn previous_backup_state(&self, position: u8) -> Result<FullState, String> {
+        self.backups.borrow().previous_state(position)
+    }
+
+    pub fn set_task_checked(
+        &self,
+        local_date: &str,
+        task_id: TaskId,
+        checked: bool,
+        current_local_date: &str,
+        updated_at_utc: &str,
+    ) -> Result<(), String> {
+        let mut state = self.load_state()?;
+        state.set_task_checked(
+            local_date,
+            task_id,
+            checked,
+            current_local_date,
+            updated_at_utc,
+        )?;
+        state.validate(current_local_date)?;
+        self.replace_validated_state(state)
+    }
+
+    fn replace_validated_state(&self, state: FullState) -> Result<(), String> {
+        let previous_state = self.load_state()?;
+        self.backups
+            .borrow_mut()
+            .stage_pre_change(&previous_state)?;
+
+        let serialized = serde_json::to_string(&state)
+            .map_err(|error| format!("unable to serialize application state: {error}"))?;
+        self.persist_state(&serialized)?;
+        self.backups.borrow().promote_staged_pre_change()
+    }
+
+    fn load_state(&self) -> Result<FullState, String> {
+        let serialized = self.export_state()?;
+        serde_json::from_str(&serialized)
+            .map_err(|error| format!("stored application state is invalid JSON: {error}"))
+    }
+
+    fn persist_state(&self, serialized: &str) -> Result<(), String> {
+        let transaction = self
+            .connection
+            .unchecked_transaction()
+            .map_err(|error| format!("unable to begin application-state transaction: {error}"))?;
+        transaction
+            .execute(
+                "
+                INSERT INTO application_state (id, serialized_state)
+                VALUES (1, ?1)
+                ON CONFLICT(id) DO UPDATE SET serialized_state = excluded.serialized_state
+                ",
+                params![serialized],
+            )
+            .map_err(|error| format!("unable to persist application state: {error}"))?;
+        transaction
+            .commit()
+            .map_err(|error| format!("unable to commit application-state transaction: {error}"))
     }
 }
