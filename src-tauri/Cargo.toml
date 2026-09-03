@@ -24,3 +24,19 @@ serde_json = "1"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
+
+[[test]]
+name = "day_policy"
+path = "../tests/spec/day_policy.rs"
+
+[[test]]
+name = "history"
+path = "../tests/spec/history.rs"
+
+[[test]]
+name = "backup_contract"
+path = "../tests/spec/backup_contract.rs"
+
+[[test]]
+name = "import_export_contract"
+path = "../tests/spec/import_export_contract.rs"
