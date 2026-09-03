@@ -20,10 +20,10 @@
    - Manual evidence: the owner installed the generated artifact and confirmed close hides the window, tray Open restores it, and tray Exit removes both the window and tray icon. Per-user data-location verification is deferred because SQLite persistence begins in Phase 2.
    - Autostart evidence: the approved temporary `--phase0-autostart=enable|disable|status` Rust diagnostic compiled. It performed `enable -> true`, independent `status -> true`, and `disable -> false` as the current user without elevation. The debug WebView emitted a non-fatal class-unregistration error after each intentionally immediate diagnostic exit; Cargo returned success. The diagnostic performs no operation without one exact argument, is not renderer-accessible, and must be removed before Phase 3's final typed command boundary.
    - Next action: commit Phase 0, then create and run the frozen Phase 1 contract tests.
-7. [x] Create and run the frozen Phase 1 domain and persistence contracts.
+6. [x] Create and run the frozen Phase 1 domain and persistence contracts.
    - Evidence: `cargo test --manifest-path src-tauri/Cargo.toml --tests` failed as expected on 2026-09-02. Each frozen suite fails only because `tauri_app_lib::domain` or `tauri_app_lib::persistence` is not implemented.
    - Contract: `tests/spec/day_policy.rs`, `history.rs`, `backup_contract.rs`, and `import_export_contract.rs` are immutable without owner approval.
    - Next action: implement the smallest domain and persistence modules that make these tests pass; do not modify the frozen assertions.
-6. [/] Define the streak qualifying-day rule.
+7. [/] Define the streak qualifying-day rule.
    - Blocker: streak calculations cannot be implemented without knowing which completion fraction qualifies.
    - Acceptance: ADR-006 is accepted and `tests/spec/streaks.rs` receives frozen assertions.
