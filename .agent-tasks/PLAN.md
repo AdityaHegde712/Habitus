@@ -2,7 +2,7 @@
 
 ## Status
 
-Architecture approved on 2026-09-02. This is a planning-only checkpoint; no application code or test files exist yet.
+Architecture approved on 2026-09-02. Phase 0 and Phase 1 are complete; Phase 2 domain and persistence implementation is active. UI work remains deferred until the dedicated Phase 4 decision pass.
 
 ## Proposed interaction flow
 

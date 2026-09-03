@@ -42,3 +42,7 @@ path = "../tests/spec/backup_contract.rs"
 [[test]]
 name = "import_export_contract"
 path = "../tests/spec/import_export_contract.rs"
+
+[[test]]
+name = "repository"
+path = "../tests/integration/repository.rs"
