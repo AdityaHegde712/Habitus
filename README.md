@@ -24,6 +24,12 @@ npm run tauri build
 
 `cargo test` will become a verified developer command in Phase 1, after the frozen contract suite exists.
 
+The frozen backend contract suite is now available:
+
+```powershell
+cargo test --manifest-path src-tauri/Cargo.toml --tests
+```
+
 ## Data and recovery behavior
 
 Daily history is planned for the current user's application-data directory. Each successful state mutation will retain exactly two preceding full-state JSON backups. JSON import will validate all records before it replaces live state; export will serialize the current validated state.

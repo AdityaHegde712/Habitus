@@ -7,6 +7,9 @@ use tauri::{
 };
 use tauri_plugin_autostart::ManagerExt;
 
+pub mod domain;
+pub mod persistence;
+
 const EXIT_MENU_ID: &str = "exit";
 const MAIN_WINDOW_LABEL: &str = "main";
 const OPEN_MENU_ID: &str = "open";
