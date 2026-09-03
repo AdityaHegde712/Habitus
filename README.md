@@ -10,16 +10,19 @@ No application scaffold or executable code has been created. The approved implem
 
 The canonical remote is `https://github.com/AdityaHegde712/Ephemera.git`. It was verified on 2026-09-02 and currently has no published `main` or `dev` branch. Local work begins from `dev` and proceeds on dedicated `feature/*` branches; the owner performs merges.
 
-## Planned developer commands
+## Verified developer commands
 
-The following commands will be verified after the Windows Rust toolchain is repaired and the Tauri scaffold exists:
+The following commands are verified with the stable Windows MSVC Rust toolchain:
 
 ```powershell
 npm install
 npm run tauri dev
 npm run tauri build
-cargo test
 ```
+
+`npm run tauri build` produces x64 MSI and NSIS installer artifacts. The Phase 0 MSI lifecycle check passed: close hides to the tray, tray Open restores the window, and tray Exit terminates the application.
+
+`cargo test` will become a verified developer command in Phase 1, after the frozen contract suite exists.
 
 ## Data and recovery behavior
 
