@@ -1,38 +1,38 @@
 # Habit Tracker
 
-Windows-local habit tracker in its approved Phase 0 toolchain-validation stage.
+Windows-local habit tracker built with Tauri 2, a TypeScript renderer, and a typed Rust persistence boundary.
 
 ## Current status
 
-No application scaffold or executable code has been created. The approved implementation target is a Tauri 2 desktop application with a TypeScript renderer, a minimal Rust host, a native tray lifecycle, opt-in autostart, and local SQLite persistence.
-
-## Repository workflow
-
-The canonical remote is `https://github.com/AdityaHegde712/Ephemera.git`. It was verified on 2026-09-02 and currently has no published `main` or `dev` branch. Local work begins from `dev` and proceeds on dedicated `feature/*` branches; the owner performs merges.
+Phase 2 is complete. The Rust domain and repository layers implement deterministic daily task applicability, historical task snapshots, validated JSON import and export, SQLite storage, and two rotating JSON backups. Native Tauri commands, the final app-data location, and UI are deferred to later approved phases.
 
 ## Verified developer commands
 
-The following commands are verified with the stable Windows MSVC Rust toolchain:
+Run these from the repository root with the stable Windows MSVC Rust toolchain:
 
 ```powershell
-npm install
+cargo fmt --manifest-path src-tauri/Cargo.toml --check
+cargo test --manifest-path src-tauri/Cargo.toml --tests
+cargo check --manifest-path src-tauri/Cargo.toml
+npm run build
+```
+
+Phase 0 also verified the following Windows commands and packaged tray lifecycle:
+
+```powershell
 npm run tauri dev
 npm run tauri build
 ```
 
-`npm run tauri build` produces x64 MSI and NSIS installer artifacts. The Phase 0 MSI lifecycle check passed: close hides to the tray, tray Open restores the window, and tray Exit terminates the application.
-
-`cargo test` will become a verified developer command in Phase 1, after the frozen contract suite exists.
-
-The frozen backend contract suite is now available:
-
-```powershell
-cargo test --manifest-path src-tauri/Cargo.toml --tests
-```
-
 ## Data and recovery behavior
 
-Daily history is planned for the current user's application-data directory. Each successful state mutation will retain exactly two preceding full-state JSON backups. JSON import will validate all records before it replaces live state; export will serialize the current validated state.
+The Rust host will provide the per-user application-data directory in Phase 3. Given that host-owned directory, `Repository` creates `habit-tracker.sqlite3` and a `backups/` directory. Validated imports and typed task changes follow this order:
+
+1. Read and stage the complete pre-change state as JSON.
+2. Commit the replacement state in one SQLite transaction.
+3. Promote the staged JSON to `previous-1.json`, rotating the former latest backup to `previous-2.json`.
+
+Startup recovery promotes a valid staged backup left by an interrupted rotation. Invalid imports are rejected before any state write. Export serializes the current complete state.
 
 ## Scope
 
