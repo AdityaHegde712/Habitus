@@ -35,7 +35,7 @@
    - Build evidence: `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, `cargo test --manifest-path src-tauri/Cargo.toml --tests`, `cargo check --manifest-path src-tauri/Cargo.toml`, `npm run build`, and `npm run tauri build` passed on 2026-09-03. The x64 MSI is 3,915,776 bytes, SHA-256 `9A15F86D5EC8D0A0DF86DED998C96F09AA660E9C7362A4F7A7DC55571002A0BF`; the NSIS installer is 2,671,038 bytes, SHA-256 `2CD63B96400457EB6CCB6D59EC26FF3F63E623CE649C7BEA5712614E2925924C`.
    - Smoke evidence: the release executable launched hidden, remained running, and created `habit-tracker.sqlite3` under Tauri's local app-data identifier directory. Only the exact smoke-test process was then stopped; autostart state was not changed.
    - Blocker: manual Windows evidence is owner-facing because the Phase 4 UI is deliberately deferred. It must demonstrate tray close/Open/Exit, command-backed autostart enable/disable, and persistence across relaunch before Phase 3 is marked complete.
-   - Immediate next action: provide the owner a concise manual verification checklist; retain this branch without pushing until the check is complete.
+   - Owner decision: interactive autostart verification is deferred to the approved Phase 4 settings UI; package, automated, tray, and local app-data smoke evidence are retained.
 9. [/] Define the streak qualifying-day rule.
    - Blocker: streak calculations cannot be implemented without knowing which completion fraction qualifies.
    - Acceptance: ADR-006 is accepted and `tests/spec/streaks.rs` receives frozen assertions.

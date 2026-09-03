@@ -53,7 +53,7 @@ Each record contains `local_date` (`YYYY-MM-DD`), `applicable_task_ids`, `checke
 1. UI/UX is not designed or implemented during backend phases. When Phase 4 is reached, the owner returns to this planning session for a dedicated UI/UX decision pass before UI implementation begins.
 2. `README.md` and `CODEBASE.md` are feature deliverables. Every feature reviews both documents, updates affected public usage, setup, architecture, data-flow, test, and known-constraint sections, and verifies referenced paths and commands before its commit.
 3. The canonical remote is `https://github.com/AdityaHegde712/Ephemera.git`. At repository initialization, confirm this URL and the actual remote branch layout before changing Git state; do not assume that the remote or `dev` branch already exists.
-4. Every feature follows the project Git workflow: inspect and fetch the current remote state, create a dedicated `feature/*` branch from `dev`, keep work off `main` and `dev`, use concise conventional commits, and leave merges to the owner. After an owner-performed remote merge, fetch and prune before further work.
+4. For the remaining single-developer build, work directly on `dev`: fetch and prune after owner-performed remote merges, make concise conventional commits after verified milestones, and push `dev`. The owner remains responsible for merges from `dev` to `main`. Resume dedicated feature branches only if the owner explicitly requests them.
 5. Feature completion requires separate automated-test, applicable manual Windows/UI, and documentation-plus-Git-state evidence. Passing tests alone does not make a feature release-ready.
 
 ## vNext proposed addition: streak tracking
