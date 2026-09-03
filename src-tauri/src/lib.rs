@@ -5,53 +5,19 @@ use tauri::{
     tray::TrayIconBuilder,
     Manager, RunEvent, WindowEvent,
 };
-use tauri_plugin_autostart::ManagerExt;
 
+pub mod application;
+mod commands;
 pub mod domain;
 pub mod persistence;
 
 const EXIT_MENU_ID: &str = "exit";
 const MAIN_WINDOW_LABEL: &str = "main";
 const OPEN_MENU_ID: &str = "open";
-const PHASE0_AUTOSTART_DISABLE_ARGUMENT: &str = "--phase0-autostart=disable";
-const PHASE0_AUTOSTART_ENABLE_ARGUMENT: &str = "--phase0-autostart=enable";
-const PHASE0_AUTOSTART_STATUS_ARGUMENT: &str = "--phase0-autostart=status";
 
 #[derive(Default)]
 struct LifecycleState {
     is_quitting: AtomicBool,
-}
-
-enum Phase0AutostartAction {
-    Disable,
-    Enable,
-    Status,
-}
-
-fn phase0_autostart_action() -> Option<Phase0AutostartAction> {
-    std::env::args().find_map(|argument| match argument.as_str() {
-        PHASE0_AUTOSTART_DISABLE_ARGUMENT => Some(Phase0AutostartAction::Disable),
-        PHASE0_AUTOSTART_ENABLE_ARGUMENT => Some(Phase0AutostartAction::Enable),
-        PHASE0_AUTOSTART_STATUS_ARGUMENT => Some(Phase0AutostartAction::Status),
-        _ => None,
-    })
-}
-
-fn run_phase0_autostart_action(app: &tauri::App) -> Result<bool, Box<dyn std::error::Error>> {
-    let Some(action) = phase0_autostart_action() else {
-        return Ok(false);
-    };
-
-    let manager = app.autolaunch();
-
-    match action {
-        Phase0AutostartAction::Disable => manager.disable()?,
-        Phase0AutostartAction::Enable => manager.enable()?,
-        Phase0AutostartAction::Status => {}
-    }
-
-    println!("Phase 0 autostart enabled: {}", manager.is_enabled()?);
-    Ok(true)
 }
 
 fn main_window(app: &tauri::AppHandle) -> Option<tauri::WebviewWindow> {
@@ -131,7 +97,7 @@ pub fn run() {
         .manage(LifecycleState::default())
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .setup(|app| {
-            let is_phase0_autostart_diagnostic = run_phase0_autostart_action(app)?;
+            commands::initialize_state(app)?;
 
             let open_item = MenuItem::with_id(app, OPEN_MENU_ID, "Open", true, None::<&str>)?;
             let exit_item = MenuItem::with_id(app, EXIT_MENU_ID, "Exit", true, None::<&str>)?;
@@ -148,12 +114,17 @@ pub fn run() {
                 .on_menu_event(|app, event| handle_tray_menu_event(app, event.id.as_ref()))
                 .build(app)?;
 
-            if is_phase0_autostart_diagnostic {
-                app.handle().exit(0);
-            }
-
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![
+            commands::get_day,
+            commands::set_task_checked,
+            commands::list_calendar_days,
+            commands::export_state,
+            commands::import_state,
+            commands::get_autostart_status,
+            commands::set_autostart_enabled,
+        ])
         .build(tauri::generate_context!())
         .expect("failed to build Habit Tracker")
         .run(|app, event| {
