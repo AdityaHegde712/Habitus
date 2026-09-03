@@ -20,6 +20,8 @@ The repository contains no application scaffold, source modules, tests, package 
 
 Tauri 2 will host a bundled TypeScript renderer. A small Rust layer will own typed Tauri commands, tray lifecycle, autostart integration, and a `rusqlite` repository boundary. The renderer will have no direct SQLite or arbitrary filesystem access.
 
+`src-tauri/src/domain/` contains pure local-date validation, deterministic task applicability, color calculation, and historical record snapshots. `src-tauri/src/persistence/` contains JSON transfer types, rotating-backup recovery, and the SQLite repository boundary. Root-level `tests/spec/` is the immutable contract suite for those modules.
+
 The Phase 0 Rust lifecycle module also contains a temporary, command-line-only autostart diagnostic. It accepts only `--phase0-autostart=enable`, `disable`, or `status`, does nothing by default, and must be removed before the Phase 3 command boundary is implemented.
 
 ## Verification status
