@@ -24,6 +24,24 @@ struct TransferRecord {
     updated_at_utc: String,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct DailyRecordView {
+    pub local_date: String,
+    pub applicable_task_ids: Vec<TaskId>,
+    pub checked_task_ids: Vec<TaskId>,
+    pub applicable_count: u32,
+    pub completed_count: u32,
+    pub policy_version: u32,
+    pub updated_at_utc: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct CalendarDay {
+    pub local_date: String,
+    pub applicable_count: u32,
+    pub completed_count: u32,
+}
+
 impl FullState {
     pub fn empty() -> Self {
         Self {
@@ -136,6 +154,22 @@ impl FullState {
         &self.marker
     }
 
+    pub fn day_view(&self, local_date: &str) -> Result<DailyRecordView, String> {
+        if let Some(record) = self
+            .records
+            .iter()
+            .find(|record| record.local_date == local_date)
+        {
+            return Ok(DailyRecordView::from(record));
+        }
+
+        DailyRecordView::empty(local_date)
+    }
+
+    pub fn calendar_days(&self) -> Vec<CalendarDay> {
+        self.records.iter().map(CalendarDay::from).collect()
+    }
+
     pub fn set_task_checked(
         &mut self,
         local_date: &str,
@@ -202,6 +236,47 @@ impl TransferRecord {
         self.completed_count = self.checked_task_ids.len() as u32;
         self.updated_at_utc = updated_at_utc.to_owned();
         Ok(())
+    }
+}
+
+impl DailyRecordView {
+    fn empty(local_date: &str) -> Result<Self, String> {
+        let applicable_task_ids = applicable_task_ids(local_date)?;
+        let applicable_count = applicable_task_ids.len() as u32;
+
+        Ok(Self {
+            local_date: local_date.to_owned(),
+            applicable_task_ids,
+            checked_task_ids: Vec::new(),
+            applicable_count,
+            completed_count: 0,
+            policy_version: 1,
+            updated_at_utc: String::new(),
+        })
+    }
+}
+
+impl From<&TransferRecord> for DailyRecordView {
+    fn from(record: &TransferRecord) -> Self {
+        Self {
+            local_date: record.local_date.clone(),
+            applicable_task_ids: record.applicable_task_ids.clone(),
+            checked_task_ids: record.checked_task_ids.clone(),
+            applicable_count: record.applicable_count,
+            completed_count: record.completed_count,
+            policy_version: record.policy_version,
+            updated_at_utc: record.updated_at_utc.clone(),
+        }
+    }
+}
+
+impl From<&TransferRecord> for CalendarDay {
+    fn from(record: &TransferRecord) -> Self {
+        Self {
+            local_date: record.local_date.clone(),
+            applicable_count: record.applicable_count,
+            completed_count: record.completed_count,
+        }
     }
 }
 

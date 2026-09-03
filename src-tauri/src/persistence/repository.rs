@@ -4,7 +4,10 @@ use rusqlite::{params, Connection, OptionalExtension};
 
 use crate::domain::task_policy::TaskId;
 
-use super::{backup_recovery::BackupStore, transfer::FullState};
+use super::{
+    backup_recovery::BackupStore,
+    transfer::{CalendarDay, DailyRecordView, FullState},
+};
 
 pub struct Repository {
     backups: RefCell<BackupStore>,
@@ -70,6 +73,14 @@ impl Repository {
 
     pub fn previous_backup_state(&self, position: u8) -> Result<FullState, String> {
         self.backups.borrow().previous_state(position)
+    }
+
+    pub fn day_view(&self, local_date: &str) -> Result<DailyRecordView, String> {
+        self.load_state()?.day_view(local_date)
+    }
+
+    pub fn calendar_days(&self) -> Result<Vec<CalendarDay>, String> {
+        Ok(self.load_state()?.calendar_days())
     }
 
     pub fn set_task_checked(
