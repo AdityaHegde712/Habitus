@@ -1,10 +1,10 @@
-# Habit Tracker
+# Habitus
 
-Windows-local habit tracker built with Tauri 2, a TypeScript renderer, and a typed Rust persistence boundary.
+Habitus is a Windows-local habit tracker built with Tauri 2, a TypeScript renderer, and a typed Rust persistence boundary.
 
 ## Current status
 
-Phase 3 native integration is ready for manual Windows verification. The Rust host exposes only typed commands for daily records, JSON transfer, and opt-in autostart. UI layout and settings presentation remain deferred to the approved Phase 4 design pass.
+Phase 4 provides the approved single-page dashboard: today's editable checklist is fixed at the top, and a Git-style history tracker with an inspectable saved checklist fills the lower page. The Rust host exposes only typed commands for daily records, JSON transfer, and opt-in autostart.
 
 ## Verified developer commands
 
@@ -15,6 +15,7 @@ cargo fmt --manifest-path src-tauri/Cargo.toml --check
 cargo test --manifest-path src-tauri/Cargo.toml --tests
 cargo check --manifest-path src-tauri/Cargo.toml
 npm run build
+npm run test:ui
 ```
 
 Phase 0 also verified the following Windows commands and packaged tray lifecycle:
@@ -37,6 +38,10 @@ Startup recovery promotes a valid staged backup left by an interrupted rotation.
 ## Native command boundary
 
 The bundled renderer can invoke only `get_day`, `set_task_checked`, `list_calendar_days`, `export_state`, `import_state`, `get_autostart_status`, and `set_autostart_enabled`. Dates, stable task IDs, totals, and import documents are validated in Rust. The autostart plugin is managed only by these Rust commands and defaults to disabled; there is no renderer-facing plugin permission or arbitrary SQL, filesystem, or shell command path.
+
+## Dashboard behavior
+
+The app opens to today's local checklist. Checkbox changes invoke the typed `set_task_checked` command and refresh the dashboard from persisted state. The completion tracker represents the preceding 18 weeks. Selecting a tracker cell invokes `get_day` for that local date and displays its persisted task snapshot; historical applicability is never recalculated in the renderer. The lower detail panel sits beside the tracker on desktop and below it on narrow viewports.
 
 ## Scope
 

@@ -1,4 +1,4 @@
-# Habit Tracker - Proposed Backend-First Plan
+# Habitus - Proposed Backend-First Plan
 
 ## Status
 
@@ -53,7 +53,7 @@ Each record contains `local_date` (`YYYY-MM-DD`), `applicable_task_ids`, `checke
 1. UI/UX is not designed or implemented during backend phases. When Phase 4 is reached, the owner returns to this planning session for a dedicated UI/UX decision pass before UI implementation begins.
 2. `README.md` and `CODEBASE.md` are feature deliverables. Every feature reviews both documents, updates affected public usage, setup, architecture, data-flow, test, and known-constraint sections, and verifies referenced paths and commands before its commit.
 3. The canonical remote is `https://github.com/AdityaHegde712/Ephemera.git`. At repository initialization, confirm this URL and the actual remote branch layout before changing Git state; do not assume that the remote or `dev` branch already exists.
-4. Every feature follows the project Git workflow: inspect and fetch the current remote state, create a dedicated `feature/*` branch from `dev`, keep work off `main` and `dev`, use concise conventional commits, and leave merges to the owner. After an owner-performed remote merge, fetch and prune before further work.
+4. For the remaining single-developer build, work directly on `dev`: fetch and prune after owner-performed remote merges, make concise conventional commits after verified milestones, and push `dev`. The owner remains responsible for merges from `dev` to `main`. Resume dedicated feature branches only if the owner explicitly requests them.
 5. Feature completion requires separate automated-test, applicable manual Windows/UI, and documentation-plus-Git-state evidence. Passing tests alone does not make a feature release-ready.
 
 ## vNext proposed addition: streak tracking
@@ -100,9 +100,11 @@ Add the narrow Tauri commands, capability configuration, tray lifecycle, and aut
 
 **Git/documentation gate:** Document the tray/autostart lifecycle and capability boundary from implemented code, then verify documentation links before the feature commit.
 
-### Phase 4: Frontend and calendar - deferred
+### Phase 4: Frontend and calendar - design approval pending
 
-The owner returns to this planning session for a UI/UX design pass using the UI/UX skill before UI implementation. The UI may consume only the approved typed command contract; it cannot recalculate historical denominators itself.
+The Phase 4 design pass is complete enough for owner approval. The proposed one-page dashboard keeps today's editable checklist fixed at the top. Below it, a Git-style completion tracker displays historical days, and the selected historical checklist is beside the tracker on desktop and stacks below it on narrow viewports. The UI may consume only the approved typed command contract; it cannot recalculate historical denominators itself. The isolated visual prototype and its reproducible Playwright render script live in `.agent-tasks/phase4-ui/`; they are design evidence, not production renderer code.
+
+**Design evidence:** Chromium screenshots at 1160px and 390px were regenerated on 2026-09-03 after a Playwright interaction assertion selected Sep 14 and verified its `6 / 7` historical detail state. Both widths have no horizontal overflow. Owner approval remains required before production UI implementation.
 
 **Exit criteria:** screenshot-led visual evidence at desktop and narrow widths, including hover task count and selected-day detail.
 
