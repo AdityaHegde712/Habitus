@@ -27,7 +27,7 @@ export interface CalendarDay {
 
 export const habitApi = {
   getDay(localDate: string): Promise<DailyRecordView> {
-    return invoke<DailyRecordView>("get_day", { localDate });
+    return invoke<DailyRecordView>("get_day", { local_date: localDate });
   },
 
   listCalendarDays(): Promise<CalendarDay[]> {
@@ -35,6 +35,10 @@ export const habitApi = {
   },
 
   setTaskChecked(localDate: string, taskId: TaskId, checked: boolean): Promise<void> {
-    return invoke<void>("set_task_checked", { localDate, taskId, checked });
+    return invoke<void>("set_task_checked", {
+      local_date: localDate,
+      task_id: taskId,
+      checked,
+    });
   },
 };

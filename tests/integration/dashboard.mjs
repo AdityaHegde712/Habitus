@@ -77,7 +77,7 @@ async function installTauriMock(page) {
     window.__TAURI_INTERNALS__ = {
       invoke: async (command, arguments_) => {
         if (command === "get_day") {
-          return dayFixture[arguments_.localDate];
+          return dayFixture[arguments_.local_date];
         }
 
         if (command === "list_calendar_days") {
@@ -89,13 +89,13 @@ async function installTauriMock(page) {
         }
 
         if (command === "set_task_checked") {
-          const day = dayFixture[arguments_.localDate];
+          const day = dayFixture[arguments_.local_date];
           const checkedTaskIds = new Set(day.checked_task_ids);
 
           if (arguments_.checked) {
-            checkedTaskIds.add(arguments_.taskId);
+            checkedTaskIds.add(arguments_.task_id);
           } else {
-            checkedTaskIds.delete(arguments_.taskId);
+            checkedTaskIds.delete(arguments_.task_id);
           }
 
           day.checked_task_ids = [...checkedTaskIds];

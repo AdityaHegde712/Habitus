@@ -140,6 +140,14 @@ function renderError(error: unknown): void {
 
   if (errorMessage !== null) {
     errorMessage.textContent = `Could not update the dashboard: ${message}`;
+    return;
+  }
+
+  app.innerHTML = `<main class="app-shell"><section class="card startup-error" aria-labelledby="startup-error-title"><h1 id="startup-error-title">Habit Tracker could not load</h1><p class="error-message" role="alert"></p></section></main>`;
+  const startupError = document.querySelector<HTMLElement>(".startup-error .error-message");
+
+  if (startupError !== null) {
+    startupError.textContent = `Could not load local habit data: ${message}`;
   }
 }
 
