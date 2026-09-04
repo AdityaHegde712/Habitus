@@ -100,9 +100,11 @@ Add the narrow Tauri commands, capability configuration, tray lifecycle, and aut
 
 **Git/documentation gate:** Document the tray/autostart lifecycle and capability boundary from implemented code, then verify documentation links before the feature commit.
 
-### Phase 4: Frontend and calendar - deferred
+### Phase 4: Frontend and calendar - design approval pending
 
-The owner returns to this planning session for a UI/UX design pass using the UI/UX skill before UI implementation. The UI may consume only the approved typed command contract; it cannot recalculate historical denominators itself.
+The Phase 4 design pass is complete enough for owner approval. The proposed one-page dashboard keeps today's editable checklist fixed at the top. Below it, a Git-style completion tracker displays historical days, and the selected historical checklist is beside the tracker on desktop and stacks below it on narrow viewports. The UI may consume only the approved typed command contract; it cannot recalculate historical denominators itself. The isolated visual prototype and its reproducible Playwright render script live in `.agent-tasks/phase4-ui/`; they are design evidence, not production renderer code.
+
+**Design evidence:** Chromium screenshots at 1160px and 390px were regenerated on 2026-09-03 after a Playwright interaction assertion selected Sep 14 and verified its `6 / 7` historical detail state. Both widths have no horizontal overflow. Owner approval remains required before production UI implementation.
 
 **Exit criteria:** screenshot-led visual evidence at desktop and narrow widths, including hover task count and selected-day detail.
 

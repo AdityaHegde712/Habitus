@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Habit Tracker UI Prototype</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --background: #121212;
+        --surface: #1e1e1e;
+        --surface-raised: #252525;
+        --text: #e0e0e0;
+        --muted: #a0a0a0;
+        --border: #2a2a2a;
+        --accent: #65d88a;
+        --accent-strong: #1f9d55;
+        --empty: #2a2a2a;
+        --focus: #d6ff70;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        background: var(--background);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button { font: inherit; }
+
+      .app-shell { max-width: 1160px; margin: 0 auto; padding: 32px 24px 48px; }
+
+      .topbar, .section-heading, .selected-heading, .task-row, .detail-row, .legend { display: flex; align-items: center; }
+
+      .topbar { justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+
+      h1, h2, h3, p { margin: 0; }
+      h1 { font-size: 1.4rem; letter-spacing: -0.02em; }
+      h2 { font-size: 1.05rem; }
+      h3 { font-size: 0.9rem; }
+
+      .eyebrow, .section-copy, .detail-copy, .task-meta { color: var(--muted); font-size: 0.84rem; }
+      .eyebrow { margin-top: 4px; }
+
+      .status-chip {
+        border: 1px solid rgba(101, 216, 138, 0.35);
+        border-radius: 999px;
+        color: var(--accent);
+        font-size: 0.78rem;
+        padding: 6px 10px;
+      }
+
+      .card { border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+
+      .today { padding: 24px; }
+      .section-heading { justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+      .progress { color: var(--accent); font-size: 0.9rem; font-weight: 700; }
+
+      .task-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .task-row { gap: 10px; min-height: 48px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: #1a1a1a; }
+      .task-row.checked { border-color: rgba(101, 216, 138, 0.35); }
+      .task-check { width: 18px; height: 18px; accent-color: var(--accent-strong); }
+      .task-label { flex: 1; font-size: 0.9rem; }
+      .task-row.checked .task-label { color: var(--muted); text-decoration: line-through; }
+      .task-meta { font-size: 0.73rem; }
+
+      .history { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; margin-top: 20px; }
+      .tracker, .selected-day { padding: 22px; }
+      .tracker .section-copy { margin-top: 4px; }
+
+      .months { display: grid; grid-template-columns: repeat(18, 18px); grid-template-rows: repeat(7, 18px); grid-auto-flow: column; gap: 5px; margin-top: 22px; }
+
+      .day {
+        width: 15px;
+        height: 15px;
+        border: 0;
+        border-radius: 3px;
+        background: var(--empty);
+        cursor: pointer;
+        padding: 0;
+      }
+      .day[data-level="1"] { background: #174d2b; }
+      .day[data-level="2"] { background: #23743c; }
+      .day[data-level="3"] { background: #37a857; }
+      .day[data-level="4"] { background: #65d88a; }
+      .day[aria-pressed="true"] { outline: 2px solid var(--focus); outline-offset: 2px; }
+      .day:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+      .legend { justify-content: flex-end; gap: 6px; margin-top: 18px; color: var(--muted); font-size: 0.72rem; }
+      .legend-square { width: 12px; height: 12px; border-radius: 2px; background: var(--empty); }
+      .legend-square:nth-of-type(2) { background: #174d2b; }
+      .legend-square:nth-of-type(3) { background: #23743c; }
+      .legend-square:nth-of-type(4) { background: #37a857; }
+      .legend-square:nth-of-type(5) { background: #65d88a; }
+
+      .selected-heading { justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+      .detail-copy { margin-bottom: 18px; }
+      .detail-list { display: grid; gap: 9px; }
+      .detail-row { gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+      .detail-row:last-child { border-bottom: 0; }
+      .detail-icon { color: var(--accent); font-weight: 700; }
+      .detail-icon.open { color: var(--muted); }
+      .detail-state { margin-left: auto; color: var(--muted); font-size: 0.73rem; }
+
+      @media (max-width: 760px) {
+        .app-shell { padding: 20px 16px 32px; }
+        .topbar { align-items: flex-start; flex-direction: column; gap: 10px; }
+        .task-grid { grid-template-columns: 1fr; }
+        .history { grid-template-columns: 1fr; }
+        .months { grid-template-columns: repeat(18, minmax(0, 1fr)); grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 3px; }
+        .day { width: 100%; aspect-ratio: 1; height: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>Habit Tracker</h1>
+          <p class="eyebrow">Thursday, September 3</p>
+        </div>
+        <span class="status-chip">Local only</span>
+      </header>
+
+      <section class="card today" aria-labelledby="today-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="today-title">Today</h2>
+            <p class="section-copy">Keep the basics moving. Changes save immediately.</p>
+          </div>
+          <span class="progress">4 / 6 complete</span>
+        </div>
+        <div class="task-grid">
+          <label class="task-row checked"><input class="task-check" type="checkbox" checked /><span class="task-label">Meals</span><span class="task-meta">done</span></label>
+          <label class="task-row checked"><input class="task-check" type="checkbox" checked /><span class="task-label">7h sleep</span><span class="task-meta">done</span></label>
+          <label class="task-row"><input class="task-check" type="checkbox" /><span class="task-label">Job application</span><span class="task-meta">open</span></label>
+          <label class="task-row checked"><input class="task-check" type="checkbox" checked /><span class="task-label">Vitamins</span><span class="task-meta">done</span></label>
+          <label class="task-row"><input class="task-check" type="checkbox" /><span class="task-label">LeetCode / DSA</span><span class="task-meta">open</span></label>
+          <label class="task-row checked"><input class="task-check" type="checkbox" checked /><span class="task-label">Surfaces clean</span><span class="task-meta">done</span></label>
+        </div>
+      </section>
+
+      <section class="history" aria-label="Habit history">
+        <article class="card tracker">
+          <div class="section-heading">
+            <div>
+              <h2>Consistency</h2>
+              <p class="section-copy">September 2026 · select a day to inspect its saved checklist</p>
+            </div>
+          </div>
+          <div class="months" role="group" aria-label="June through September completion tracker"></div>
+          <div class="legend" aria-label="Completion intensity legend"><span>Less</span><span class="legend-square"></span><span class="legend-square"></span><span class="legend-square"></span><span class="legend-square"></span><span class="legend-square"></span><span>More</span></div>
+        </article>
+
+        <aside class="card selected-day" aria-live="polite" aria-labelledby="selected-title">
+          <div class="selected-heading"><h2 id="selected-title">Sep 8</h2><span class="progress" id="selected-progress">4 / 6</span></div>
+          <p class="detail-copy">Historical checklist · saved snapshot</p>
+          <div class="detail-list" id="detail-list"></div>
+        </aside>
+      </section>
+    </main>
+    <script>
+      const heatmap = document.querySelector('.months');
+      const title = document.querySelector('#selected-title');
+      const progress = document.querySelector('#selected-progress');
+      const detailList = document.querySelector('#detail-list');
+      const baseTaskNames = ['Meals', '7h sleep', 'Job application', 'Vitamins', 'LeetCode / DSA', 'Surfaces clean'];
+
+      const shortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+      const longDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' });
+      const startDate = new Date(Date.UTC(2026, 5, 1));
+
+      for (let offset = 0; offset < 126; offset += 1) {
+        const date = new Date(startDate);
+        date.setUTCDate(startDate.getUTCDate() + offset);
+        const total = [1, 3, 5].includes(date.getUTCDay()) ? 7 : 6;
+        let complete = (offset * 3 + 2) % (total + 1);
+        const day = document.createElement('button');
+        const dateLabel = shortDate.format(date);
+        const longDateLabel = longDate.format(date);
+
+        if (dateLabel === 'Sep 8') complete = 4;
+        if (dateLabel === 'Sep 14') complete = 6;
+        const level = Math.ceil((complete / total) * 4);
+
+        day.className = 'day';
+        day.dataset.date = dateLabel;
+        day.dataset.complete = complete;
+        day.dataset.total = total;
+        day.dataset.level = level;
+        day.setAttribute('aria-label', `${longDateLabel}, ${complete} of ${total} complete`);
+        day.setAttribute('aria-pressed', dateLabel === 'Sep 8' ? 'true' : 'false');
+        heatmap.append(day);
+      }
+
+      const days = document.querySelectorAll('.day');
+
+      function renderHistoricalChecklist(total, complete) {
+        const taskNames = total === 7
+          ? [...baseTaskNames.slice(0, 2), 'Exercise', ...baseTaskNames.slice(2)]
+          : baseTaskNames;
+
+        detailList.replaceChildren(...taskNames.map((taskName, index) => {
+          const isComplete = index < complete;
+          const row = document.createElement('div');
+          const icon = document.createElement('span');
+          const label = document.createElement('span');
+          const state = document.createElement('span');
+
+          row.className = 'detail-row';
+          icon.className = isComplete ? 'detail-icon' : 'detail-icon open';
+          icon.textContent = isComplete ? '✓' : '○';
+          label.textContent = taskName;
+          state.className = 'detail-state';
+          state.textContent = isComplete ? 'complete' : 'open';
+          row.append(icon, label, state);
+          return row;
+        }));
+      }
+
+      function selectDay(day) {
+        days.forEach((candidate) => candidate.setAttribute('aria-pressed', 'false'));
+        day.setAttribute('aria-pressed', 'true');
+        title.textContent = day.dataset.date;
+        progress.textContent = `${day.dataset.complete} / ${day.dataset.total}`;
+        renderHistoricalChecklist(Number(day.dataset.total), Number(day.dataset.complete));
+      }
+
+      days.forEach((day) => {
+        day.addEventListener('click', () => selectDay(day));
+      });
+
+      selectDay(document.querySelector('.day[aria-pressed="true"]'));
+    </script>
+  </body>
+</html>

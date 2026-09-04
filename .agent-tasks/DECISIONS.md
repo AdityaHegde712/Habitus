@@ -51,3 +51,11 @@
 **Decision:** Derive streaks from daily historical records at query time; never persist mutable streak counters. A qualifying-day threshold must be accepted before implementation.
 
 **Consequences:** Past edits and imports automatically recalculate both metrics correctly. Queries are tiny at the expected personal scale; no cache is needed.
+
+### ADR-007: Fixed today panel with inspectable historical detail
+
+**Status:** Accepted, 2026-09-03
+
+**Decision:** The Phase 4 UI is a single page. Today's editable checklist stays at the top, while the lower history area pairs a Git-style tracker with a selected historical-day checklist on desktop and stacks the checklist beneath the tracker on narrow viewports.
+
+**Consequences:** Selecting history never replaces today's checklist or changes its editing context. The renderer requests the selected day's persisted snapshot from the typed host boundary and does not derive historical task applicability from the calendar cell.

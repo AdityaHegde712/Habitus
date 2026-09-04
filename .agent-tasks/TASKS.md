@@ -1,6 +1,6 @@
 # Task Ledger
 
-## Current phase: Phase 3 native integration - not started
+## Current phase: Phase 4 frontend and calendar - design approval pending
 
 1. [x] Capture the stated task checklist and tray/startup requirements.
    - Acceptance: Plan identifies close-to-tray and explicit-exit semantics.
@@ -39,3 +39,8 @@
 9. [/] Define the streak qualifying-day rule.
    - Blocker: streak calculations cannot be implemented without knowing which completion fraction qualifies.
    - Acceptance: ADR-006 is accepted and `tests/spec/streaks.rs` receives frozen assertions.
+10. [/] Approve the Phase 4 one-page dashboard design before production implementation.
+   - Decision: Today remains fixed at the top. The historical tracker is below it; its selected day appears beside the tracker at desktop width and below it at narrow width.
+   - Evidence: `.agent-tasks/phase4-ui/render_prototype.mjs` regenerated Chromium desktop (1160px) and narrow (390px) screenshots on 2026-09-03. Its interaction assertion selects Sep 14 and verifies the historical panel reports `6 / 7`.
+   - Acceptance: the owner explicitly approves this screenshot-led layout and interaction model. Then replace the prototype with production code that invokes only the existing typed command contract.
+   - Implementation evidence: owner approved the rendered design on 2026-09-03. `src/habit-api.ts` contains the renderer's narrow typed adapter; `src/main.ts` renders and refreshes the fixed Today panel, 18-week tracker, and selected historical snapshot. `tests/integration/dashboard.mjs` asserts history selection plus a checkbox mutation through a mocked typed IPC boundary. `npm run build`, `npm run test:ui`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, `cargo test --manifest-path src-tauri/Cargo.toml --tests` (16 assertions), and `cargo check --manifest-path src-tauri/Cargo.toml` passed on 2026-09-03.

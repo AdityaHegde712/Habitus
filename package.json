@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test:ui": "npm run build && node tests/integration/dashboard.mjs",
     "tauri": "tauri"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
+    "playwright": "^1.62.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.3"
   }

@@ -5,7 +5,10 @@
 ```text
 habit-tracker/
 ├── .agent-tasks/                 # Approved plan, decisions, and task ledger
-├── src/                          # Phase 0 TypeScript renderer scaffold
+├── src/                          # Phase 4 typed TypeScript dashboard
+│   ├── habit-api.ts              # Renderer-only typed Tauri command adapter
+│   ├── main.ts                   # Dashboard state loading and event handling
+│   └── styles.css                # Responsive dark dashboard presentation
 ├── src-tauri/
 │   ├── src/
 │   │   ├── application.rs        # Typed command-facing service
@@ -28,6 +31,8 @@ habit-tracker/
 
 `application.rs` owns the typed use cases and a mutex-protected repository. `commands.rs` resolves only Tauri's local app-data directory, supplies current local/UTC time, and registers the seven approved commands. The Phase 0 lifecycle in `src-tauri/src/lib.rs` still owns close-to-tray, tray Open, and tray Exit; its temporary CLI autostart diagnostic has been removed. The sole capability is `core:default`; the renderer has no direct SQLite, filesystem, autostart-plugin, or arbitrary command access.
 
+`src/habit-api.ts` is the renderer's single IPC adapter. `src/main.ts` loads today's record, a selected historical record, and calendar summaries through that adapter; it renders task controls from the host-provided applicable-task snapshot and sends only stable task IDs back to the host. `styles.css` keeps the approved gray, black, and green dashboard responsive without a framework dependency.
+
 ## Data flow
 
 ```text
@@ -46,3 +51,5 @@ Renderer typed command
 `tests/spec/` is frozen without owner approval and currently contains 11 assertions for task policy, history, backups, and import/export. `tests/integration/repository.rs` verifies backup-aware import, typed task mutation snapshots, and idempotent reopening of an existing SQLite database. `tests/integration/command_boundary.rs` verifies host-owned persistence, input rejection, and typed day/transfer operations.
 
 The verified command is `cargo test --manifest-path src-tauri/Cargo.toml --tests`; it runs 16 assertions. Rust formatting, Rust compile checks, the Vite production build, and an x64 MSI/NSIS package build are also verified. Manual Windows lifecycle, autostart, and persistence checks remain pending.
+
+`npm run test:ui` builds the renderer and runs the mutable Playwright dashboard integration script with a typed Tauri IPC mock. It verifies historical selection and a today-task mutation at desktop and narrow viewports.
