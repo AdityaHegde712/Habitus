@@ -1,6 +1,6 @@
-# Habit Tracker
+# Habitus
 
-Windows-local habit tracker built with Tauri 2, a TypeScript renderer, and a typed Rust persistence boundary.
+Habitus is a Windows-local habit tracker built with Tauri 2, a TypeScript renderer, and a typed Rust persistence boundary.
 
 ## Current status
 

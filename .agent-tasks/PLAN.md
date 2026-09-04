@@ -1,4 +1,4 @@
-# Habit Tracker - Proposed Backend-First Plan
+# Habitus - Proposed Backend-First Plan
 
 ## Status
 

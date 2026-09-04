@@ -1,4 +1,4 @@
-# Codebase Map
+# Habitus Codebase Map
 
 ## Current layout
 
